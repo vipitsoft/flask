@@ -38,7 +38,7 @@ def register():
         token = user.generate_confirmation_token()
         send_email(user.email, u'确认账号', 'auth/email/confirm', user=user, token=token)
         flash(u'确认邮件已经发送到您的邮箱，请注意查收！')
-        return redirect(url_for('main.index'))
+        return redirect(url_for('auth.login',user=user))
     return render_template('auth/register.html', form=form)
 
 
@@ -46,12 +46,13 @@ def register():
 @login_required
 def confirm(token):
     if current_user.confirmed:
-        return redirect(url_for('main.index'))
+        return redirect(url_for('auth.login',current_user=current_user.name))
     if current_user.confirm(token):
         flash(u'您已经确认了账户，谢谢！')
+        return redirect(url_for('auth.login',current_user=current_user.name))
     else:
         flash(u'确认链接无效或已过期！')
-    return redirect(url_for('main.index'))
+    return redirect(url_for('auth.login',current_user=current_user.name))
 
 
 @auth.before_app_request
@@ -82,7 +83,7 @@ def resend_confirmation():
 # 更新已登录用户的访问时间
 @auth.before_app_request
 def before_request():
-    if current_user.is_authenticated():
+    if current_user.is_authenticated:
         current_user.ping()
         if not current_user.confirmed \
                 and request.endpoint[:5] != 'auth.':

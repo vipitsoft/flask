@@ -33,8 +33,15 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User(email=form.email.data, username=form.username.data, password=form.password.data)
-        db.session.add(user)
-        db.session.commit()
+        try:
+            db.session.add(user)
+            db.session.commit()
+        except:
+            db.session.rollback()
+            raise
+        finally:
+            db.session.close()
+
         token = user.generate_confirmation_token()
         send_email(user.email, u'确认账号', 'auth/email/confirm', user=user, token=token)
         flash(u'确认邮件已经发送到您的邮箱，请注意查收！')
@@ -46,13 +53,13 @@ def register():
 @login_required
 def confirm(token):
     if current_user.confirmed:
-        return redirect(url_for('auth.login',current_user=current_user.name))
+        return redirect(url_for('auth.login'))
     if current_user.confirm(token):
         flash(u'您已经确认了账户，谢谢！')
-        return redirect(url_for('auth.login',current_user=current_user.name))
+        return redirect(url_for('auth.login'))
     else:
         flash(u'确认链接无效或已过期！')
-    return redirect(url_for('auth.login',current_user=current_user.name))
+    return redirect(url_for('auth.login'))
 
 
 @auth.before_app_request

@@ -22,7 +22,7 @@
         </div>
         <div class="post-footer">
             <a href="{{ url_for('.post', id=post.id) }}">
-                <span class="label label-default">下一篇</span>
+                <span class="label label-primary">{{ post.comments.count() }}评论</span>
             </a>
             {% if current_user == post.author %}
             <a href="{{ url_for('.edit', id=post.id) }}">

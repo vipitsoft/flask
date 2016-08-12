@@ -1,0 +1,20 @@
+<div class="comment-body">
+    {% if comments.disabled %}
+    <p><i>此评论已被禁用</i></p>
+    {% endif %}
+    {% if moderate or not comments.disabled %}
+        {% if comments.body_html %}
+            {{ comments.body_html | safe }}
+        {% else %}
+            {{ comments.body }}
+        {% endif %}
+    {% endif %}
+</div>
+{% if moderate %}
+    <br>
+    {% if comments.disabled %}
+        <a class="btn btn-default btn-xs" href="{{ url_for('.moderate_enable', id=comments.id, page=page) }}">启用</a>
+    {% else %}
+        <a class="btn btn-danger btn-xs" href="{{ url_for('.moderate_disable', id=comments.id, page=page) }}">禁用</a>
+    {% endif %}
+{% endif %}

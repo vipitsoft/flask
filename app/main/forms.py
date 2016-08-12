@@ -53,3 +53,7 @@ class PostForm(Form):
     body = PageDownField(u"在想什么？", validators=[Required()])
     submit = SubmitField(u'提交')
 
+
+class CommentForm(Form):
+    body = StringField('', validators=[Required()])
+    submit = SubmitField(u'提交')
